@@ -1,7 +1,14 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "baseUrl": "./src",   // Définir la base des chemins relatifs
+    "paths": {
+      "@/*": ["src/*"]    // Alias @ pointe vers src/
+    },
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "strict": true,
+    // Autres configurations...
+  },
+  "include": ["src"]
 }
