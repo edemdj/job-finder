@@ -16,6 +16,18 @@ export default {
           800: '#1e40af',
           900: '#1e3a8a',
         },
+        brown: {
+          50: '#F4E2D8',   // Light sand
+          100: '#F0D7C7',  // Very light brown
+          200: '#E8C5A6',  // Light beige
+          300: '#D2B48C',  // Light brown/beige
+          400: '#C19A6B',  // Medium light brown
+          500: '#A0522D',  // Medium brown
+          600: '#8B4513',  // Saddle brown
+          700: '#7B3F00',  // Dark brown
+          800: '#654321',  // Very dark brown
+          900: '#4A2C17',  // Darkest brown
+        },
       },
     },
   },
