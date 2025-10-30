@@ -1,3 +1,5 @@
+// Ajouter en haut du fichier
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -6,25 +8,22 @@ const userRoutes = require('./routes/users');
 const applicationRoutes = require('./routes/applications');
 const authRoutes = require('./routes/auth');
 const cors = require('cors');
-
-
-
+const path = require('path'); // si jamais utilisé pour static files
 
 const app = express();
 
-// Middleware pour autoriser les requêtes de n'importe quelle origine
-// Permettre les requêtes de votre frontend
+// CORS (ex : frontend en dev sur 5173)
 app.use(cors({
-    origin: 'http://localhost:5173', // Remplacez par l'URL de votre frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Méthodes autorisées
-    allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
-  }));
+  origin: 'http://localhost:5173',
+  methods: ['GET','POST','PUT','DELETE'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
 
-// Middleware pour parser le corps des requêtes
 app.use(bodyParser.json());
 
-// Connexion à MongoDB
-mongoose.connect('mongodb://localhost:27017/jobfinder_benin', {
+// Connexion à MongoDB via variable d'environnement
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/jobfinder_benin';
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -37,12 +36,8 @@ app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 
-app.get('/', (req, res) => {
-  res.send('API JobFinder Benin');
-});
+app.get('/', (req, res) => res.send('API JobFinder Benin'));
 
-// Lancer le serveur
+// Port depuis .env si présent
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
