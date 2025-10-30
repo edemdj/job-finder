@@ -90,11 +90,17 @@ const SearchOffer: React.FC = () => {
 
       if (!res.ok) throw new Error("Erreur serveur lors de la recherche");
 
+      // NORMALISATION: map backend _id -> id so Links are built correctly
       const data = await res.json();
-      const offers: Offer[] = data.offers ?? data;
-      const more = typeof data.hasMore === "boolean" ? data.hasMore : offers.length === 10;
+      const offersRaw: any[] = data.offers ?? data;
+      const mappedOffers: Offer[] = offersRaw.map((o: any) => ({
+        ...o,
+        id: o.id ?? o._id ?? (o._id ? String(o._id) : undefined),
+      }));
 
-      setResults((prev) => (replace ? offers : [...prev, ...offers]));
+      const more = typeof data.hasMore === "boolean" ? data.hasMore : mappedOffers.length === 10;
+
+      setResults((prev) => (replace ? mappedOffers : [...prev, ...mappedOffers]));
       setHasMore(more);
       setLoading(false);
 

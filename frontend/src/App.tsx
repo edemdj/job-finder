@@ -4,7 +4,9 @@ import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Offres from './pages/Offres';
+// Utiliser le composant qui fetch l'API (liste)
+import Offers from './pages/Offers';
+import OfferDetail from './pages/OfferDetail'; // <-- nouveau
 import Profile from './pages/Profile';
 import PublishOffer from './pages/PublishOffer';
 import SearchOffer from './pages/SearchOffer';
@@ -12,7 +14,6 @@ import About from './pages/About';
 import './index.css';
 
 function App() {
-  // État simulé de l'utilisateur connecté (passé au NavBar)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
@@ -20,10 +21,10 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <NavBar isAuthenticated={isAuthenticated} onSignOut={() => setIsAuthenticated(false)} />
 
-        {/* Routes de l'application */}
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/offres" element={<Offres />} />
+          <Route path="/offres" element={<Offers />} />
+          <Route path="/offres/:id" element={<OfferDetail />} /> {/* route détail */}
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
