@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import PublishOffer from './pages/PublishOffer';
 import SearchOffer from './pages/SearchOffer';
 import About from './pages/About';
+import ApplicationsList from './pages/ApplicationsList';
 import './index.css';
 
 function App() {
@@ -31,6 +32,8 @@ function App() {
           <Route path="/publish-offer" element={<PublishOffer />} />
           <Route path="/search-offer" element={<SearchOffer />} />
           <Route path="/about" element={<About />} />
+          <Route path="/admin/applications" element={<ApplicationsList />} />
+          <Route path="/recruiter/applications" element={<ApplicationsList />} />
         </Routes>
       </div>
     </Router>

@@ -14,6 +14,10 @@ export interface Offer {
 }
 
 const OfferCard: React.FC<{ offer: Offer; onPublishSimilar?: (o: Offer) => void }> = ({ offer, onPublishSimilar }) => {
+  // Normalisation / fallback pour l'identifiant utilisé dans les liens
+  const linkId = (offer as any).id ?? (offer as any)._id ?? null;
+  const linkHref = linkId ? `/offres/${linkId}` : null;
+
   return (
     <article className="bg-white rounded-lg shadow-sm p-4 flex gap-4">
       <div className="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
@@ -28,10 +32,17 @@ const OfferCard: React.FC<{ offer: Offer; onPublishSimilar?: (o: Offer) => void 
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold text-blue-600">
-              <Link to={`/offres/${offer.id}`} className="hover:underline">{offer.title}</Link>
+              {linkHref ? (
+                <Link to={linkHref} className="hover:underline">
+                  {offer.title}
+                </Link>
+              ) : (
+                <span className="">{offer.title}</span>
+              )}
             </h3>
-            <p className="text-sm text-gray-500">{offer.company} • {offer.location}</p>
+            <p className="text-sm text-gray-500">{offer.company} {offer.company && offer.location ? '•' : ''} {offer.location}</p>
           </div>
+
           <div className="text-right text-sm text-gray-500">
             <div>{offer.contractType}</div>
             <div className="text-xs text-gray-400">{offer.createdAt ? new Date(offer.createdAt).toLocaleDateString() : ''}</div>
@@ -46,9 +57,16 @@ const OfferCard: React.FC<{ offer: Offer; onPublishSimilar?: (o: Offer) => void 
               {t}
             </button>
           ))}
+
           <div className="ml-auto flex gap-2">
-            <Link to={`/offres/${offer.id}`} className="text-sm text-blue-600 hover:underline">Voir</Link>
+            {linkHref ? (
+              <Link to={linkHref} className="text-sm text-blue-600 hover:underline">Voir</Link>
+            ) : (
+              <span className="text-sm text-gray-400">Voir</span>
+            )}
+
             <button className="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700">Postuler</button>
+
             {onPublishSimilar && (
               <button onClick={() => onPublishSimilar(offer)} className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200">
                 Publier similaire
