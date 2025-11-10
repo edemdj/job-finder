@@ -9,13 +9,12 @@ type Application = {
   applicantEmail: string;
   message?: string;
   cvPath?: string;
-  cvOriginalName?: string;
-  createdAt?: string;
   cvUrl?: string;
   recruiter?: { name?: string; email?: string } | null;
+  createdAt?: string;
 };
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+const API_BASE = (import.meta.env.VITE_API_BASE as string) ?? 'http://localhost:5000';
 
 const ApplicationsList: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -33,11 +32,11 @@ const ApplicationsList: React.FC = () => {
       if (recruiterFilter) params.append('recruiterId', recruiterFilter);
       const res = await fetch(`${API_BASE}/api/public-applications?${params.toString()}`);
       if (!res.ok) throw new Error(`Erreur ${res.status}`);
-      const data = await res.json();
+      const data = (await res.json()) as { applications?: Application[] };
       setApplications(data.applications ?? []);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Erreur lors de la récupération');
+      setError(err?.message || 'Erreur lors de la récupération');
     } finally {
       setLoading(false);
     }
@@ -53,13 +52,32 @@ const ApplicationsList: React.FC = () => {
     fetchApps();
   };
 
+  // Handlers typés pour lever l'ambiguïté TS sur e.target.value
+  const handleOfferChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOfferFilter(e.currentTarget.value);
+  };
+
+  const handleRecruiterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRecruiterFilter(e.currentTarget.value);
+  };
+
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Candidatures</h1>
 
       <form onSubmit={onFilterSubmit} className="mb-4 flex gap-2">
-        <input value={offerFilter} onChange={(e) => setOfferFilter(e.target.value)} placeholder="Filtrer par offerId" className="px-3 py-2 border rounded flex-1" />
-        <input value={recruiterFilter} onChange={(e) => setRecruiterFilter(e.target.value)} placeholder="Filtrer par recruiterId" className="px-3 py-2 border rounded flex-1" />
+        <input
+          value={offerFilter}
+          onChange={handleOfferChange}
+          placeholder="Filtrer par offerId"
+          className="px-3 py-2 border rounded flex-1"
+        />
+        <input
+          value={recruiterFilter}
+          onChange={handleRecruiterChange}
+          placeholder="Filtrer par recruiterId"
+          className="px-3 py-2 border rounded flex-1"
+        />
         <button className="px-4 py-2 bg-blue-600 text-white rounded">Filtrer</button>
       </form>
 
@@ -75,24 +93,45 @@ const ApplicationsList: React.FC = () => {
             <div key={a._id} className="bg-white p-4 rounded shadow">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-sm text-gray-500">{a.offerTitle ? <><strong>Offre:</strong> {a.offerTitle}</> : <>OfferId: {a.offerId}</>}</div>
-                  <div className="text-lg font-semibold">{a.applicantName} <span className="text-sm text-gray-500">({a.applicantEmail})</span></div>
-                  {a.message && <div className="mt-2 text-sm text-gray-700 whitespace-pre-wrap">{a.message}</div>}
+                  <div className="text-sm text-gray-500">
+                    {a.offerTitle ? (
+                      <>
+                        <strong>Offre:</strong> {a.offerTitle}
+                      </>
+                    ) : (
+                      <>OfferId: {a.offerId}</>
+                    )}
+                  </div>
+                  <div className="text-lg font-semibold">
+                    {a.applicantName}{' '}
+                    <span className="text-sm text-gray-500">({a.applicantEmail})</span>
+                  </div>
+                  {a.message && (
+                    <div className="mt-2 text-sm text-gray-700 whitespace-pre-wrap">{a.message}</div>
+                  )}
                 </div>
 
                 <div className="text-right text-sm text-gray-500">
                   <div>{a.createdAt ? new Date(a.createdAt).toLocaleString() : ''}</div>
-                  {a.recruiter && <div className="mt-2">Recruteur: {a.recruiter.name ?? ''} {a.recruiter.email ? `• ${a.recruiter.email}` : ''}</div>}
+                  {a.recruiter && (
+                    <div className="mt-2">
+                      Recruteur: {a.recruiter.name ?? ''} {a.recruiter.email ? `• ${a.recruiter.email}` : ''}
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="mt-3 flex gap-2 items-center">
                 {a.cvUrl ? (
-                  <a href={a.cvUrl} className="text-sm text-blue-600 hover:underline" target="_blank" rel="noreferrer">Télécharger le CV</a>
+                  <a href={a.cvUrl} className="text-sm text-blue-600 hover:underline" target="_blank" rel="noreferrer">
+                    Télécharger le CV
+                  </a>
                 ) : (
                   <span className="text-sm text-gray-400">Pas de CV</span>
                 )}
-                <Link to={`/offres/${a.offerId}`} className="text-sm text-blue-600 hover:underline ml-auto">Voir l'offre</Link>
+                <Link to={`/offres/${a.offerId}`} className="text-sm text-blue-600 hover:underline ml-auto">
+                  Voir l&apos;offre
+                </Link>
               </div>
             </div>
           ))}
