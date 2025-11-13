@@ -1,6 +1,4 @@
-exports.handler = async function () {
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "Hello from Netlify Functions!" }),
-    };
-  };
+exports.handler = async () => ({
+  statusCode: 200,
+  body: JSON.stringify({ ok: true }),
+});
