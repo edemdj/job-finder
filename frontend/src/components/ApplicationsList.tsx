@@ -7,11 +7,16 @@ type Application = {
   status?: string;
 };
 
-const API_BASE = (import.meta.env.VITE_API_BASE as string) ?? 'http://localhost:5000';
+// Lire la var Vite (peut être undefined)
+// NOTE: import.meta.env est injecté au build time.
+const VITE_API_BASE = (import.meta.env as any).VITE_API_BASE as string | undefined;
+const IS_DEV = (import.meta.env as any).MODE === 'development';
 
-// small helper to tell TS the shape we expect from res.json()
+// API_BASE final — en production on laisse '' si non défini (pour éviter d'injecter localhost dans le bundle)
+const API_BASE = VITE_API_BASE ?? (IS_DEV ? 'http://localhost:5000' : '');
+
+// helper
 async function fetchJson<T>(res: Response): Promise<T> {
-  // cast here is safe if you trust the API; otherwise validate before casting
   return (await res.json()) as T;
 }
 
@@ -27,10 +32,12 @@ const ApplicationsList: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        console.log('[ApplicationsList] fetching from', API_BASE);
-        const res = await fetch(`${API_BASE}/applications`);
+        console.log('[ApplicationsList] API_BASE =', API_BASE || '(empty - using relative path)');
+        // Construire l'URL : si API_BASE est vide, on utilise une requête relative (même origine)
+        const base = API_BASE.replace(/\/$/, '') || '';
+        const url = base ? `${base}/api/applications` : `/api/applications`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        // use the generic helper so TypeScript knows the expected type
         const data = await fetchJson<Application[]>(res);
         if (mounted) setApplications(data);
       } catch (err: any) {

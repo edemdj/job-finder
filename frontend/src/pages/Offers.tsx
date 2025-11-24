@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
  * - option Infinite Scroll ON/OFF
  * - pagination interne (page state) + loadMore
  *
- * Adapte l'URL de l'API (ici http://localhost:5000/api/offers).
+ * Adapte l'URL de l'API (ici via VITE_API_BASE).
  */
 
 type ViewMode = "grid" | "list";
@@ -27,6 +27,12 @@ const OffersPage: React.FC = () => {
   const [infiniteEnabled, setInfiniteEnabled] = useState(true);
 
   const abortRef = useRef<AbortController | null>(null);
+
+  // Définir la base API en utilisant la variable Vite au build time.
+  // En dev, si VITE_API_BASE n'est pas défini, on retombe sur localhost.
+  const API_BASE =
+    (import.meta as any).env.VITE_API_BASE ??
+    ((import.meta as any).env.MODE === "development" ? "http://localhost:5000" : "");
 
   // When filters change, reset page/offers and fetch page 1
   useEffect(() => {
@@ -57,8 +63,10 @@ const OffersPage: React.FC = () => {
     params.append("limit", "12");
 
     try {
-      const res = await fetch(`http://localhost:5000/api/offers?${params.toString()}`, {
-        signal: abortRef.current.signal,
+      // Utiliser API_BASE ici (ne pas hardcoder localhost)
+      const base = API_BASE.replace(/\/$/, ""); // enlever slash final si présent
+      const res = await fetch(`${base}/api/offers?${params.toString()}`, {
+        signal: abortRef.current!.signal,
       });
       if (!res.ok) throw new Error("Erreur serveur");
 
