@@ -28,7 +28,7 @@ if (process.env.NODE_ENV !== 'production' && !envOrigins.includes('http://localh
 
 app.use(cors({
   origin: (origin, callback) => {
-    // origin peut être undefined (ex: curl/postman) => autoriser
+    // origin peut être undefined (ex: requêtes via curl/postman) => autoriser
     if (!origin) return callback(null, true);
     if (envOrigins.includes(origin)) return callback(null, true);
     console.warn('CORS blocked origin:', origin);

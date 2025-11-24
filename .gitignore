@@ -1,2 +1,4 @@
 .vite/
 /backend/.env
+backend/.env
+backend/.env git add .gitignore git commit -m chore: ignore backend/.env
